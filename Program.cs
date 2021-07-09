@@ -20,11 +20,7 @@ namespace learnBot
         static void Main(string[] args)
         {
             client = new TelegramBotClient(Config.Token);
-           
-             
-            ////
-           
-
+        
             client.StartReceiving();
             client.OnMessage += onMessageHandler;
             Console.WriteLine("[Log]: Bot started");
@@ -34,7 +30,7 @@ namespace learnBot
         private static async void onMessageHandler(object sender, MessageEventArgs e)
         {
             var message = e.Message;
-            if (message.Text != null && e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Text && !string.IsNullOrEmpty(e.Message.Text))
+            if (message.Text != null && e.Message.Type == Telegram.Bot.Types.Enums.MessageType.Text && !string.IsNullOrEmpty(e.Message.Text)||message.Contact!=null)
             {
                 try
                 {
@@ -100,7 +96,15 @@ namespace learnBot
                             break;
                         case 4:
                             string telNumber = e.Message.Text;
-                            string sql6 = $"UPDATE clients SET telNumber = '{telNumber}' WHERE id = {message.Chat.Id};UPDATE clients SET step = 5 WHERE id={message.Chat.Id}";
+                            string sql6 = null;
+                            if (e.Message.Text != null)
+                                 sql6 = $"UPDATE clients SET telNumber = '{telNumber}' WHERE id = {message.Chat.Id};UPDATE clients SET step = 5 WHERE id={message.Chat.Id}";
+                            if (e.Message.Contact != null)
+                            {
+                                telNumber = e.Message.Contact.PhoneNumber;
+                                sql6 = $"UPDATE clients SET telNumber = '{telNumber}' WHERE id = {message.Chat.Id};UPDATE clients SET step = 5 WHERE id={message.Chat.Id}";
+                            }
+
                             MySqlCommand commandSixth = new MySqlCommand(sql6, conn);
                             var res6 = commandSixth.ExecuteScalar();
                             await client.SendTextMessageAsync(message.Chat.Id, "Дякуємо, уведення даних завершено. Гарного дня!");
@@ -129,6 +133,7 @@ namespace learnBot
 
                 }
             }
+          
         }
 
         private static IReplyMarkup GetButtons()
