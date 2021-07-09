@@ -43,7 +43,7 @@ namespace learnBot
                     var i = command1.ExecuteScalar();
                     var step = new MySqlCommand($"SELECT step FROM clients WHERE id = {message.Chat.Id}", conn).ExecuteScalar();
                     if (step is int a)
-                        if (a == 5)
+                        if (a == 5&&e.Message.Text=="Так")
                             step = null;
                     //switch step on which client is
                     switch (step) {
@@ -90,7 +90,7 @@ namespace learnBot
                             string city = e.Message.Text;
                             string sql5 = $"UPDATE clients SET city = '{city}' WHERE id = {message.Chat.Id};UPDATE clients SET step = 4 WHERE id={message.Chat.Id}";
                             MySqlCommand commandFifth = new MySqlCommand(sql5, conn);
-                            await client .SendTextMessageAsync(message.Chat.Id, @"Уведіть свій номер, натиснувши кнопку 'Надіслати контакт' або ввівши його у форматі +380991234567");
+                            await client .SendTextMessageAsync(message.Chat.Id, @"Уведіть свій номер, натиснувши кнопку 'Три крапки' у правому верхньому куті та 'Надіслати контакт' або ввівши його у форматі +380991234567");
                             e.Message.Text = null;
                             var res5 = commandFifth.ExecuteScalar();
                             break;
@@ -114,6 +114,19 @@ namespace learnBot
                             }
                             string text = e.Message.Text;
                             switch (text)
+                            {
+                                case TEXT_1:
+                                    await client.SendTextMessageAsync(message.Chat.Id, "Гаразд, будьте уважні!");
+                                    string sql7 = $"UPDATE clients SET step = 5 WHERE id ={message.Chat.Id}";
+                                    MySqlCommand commandSeventh = new MySqlCommand(sql7, conn);
+                                    var res7 = commandSeventh.ExecuteScalar();
+                                    break;
+                            }
+                            break;
+                        case 5:
+                            await client.SendTextMessageAsync(message.Chat.Id, "Бажаєте змінити дані?", replyMarkup: GetButtons());
+                            string text2 = e.Message.Text;
+                            switch (text2)
                             {
                                 case TEXT_1:
                                     await client.SendTextMessageAsync(message.Chat.Id, "Гаразд, будьте уважні!");
